@@ -4,5 +4,5 @@ Warning! The C2 Client communications program contains an encryption function wh
 
 My great thanks and appreciation to reenz0h at Sektor7 for his amazing Red Team Operator courses that have inspired and informed so much of this develoment project.
 For any aspiring red, blue or purple teamers like myself who wish to deepen their knowledge and understanding of Windows malware functionality, I can recommend no better place to start than the 
-"Malware Development Essentials Course" provided by Sektor7 for a very affordable price. (I have no personal affiliation to Sektor7)
+"Malware Development Essentials Course" provided by Sektor7 for a very affordable price.
 
